@@ -1,0 +1,32 @@
+name: deploy to prod
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ggt
+        run: |
+          npm install -g ggt
+          ggt version
+        shell: bash
+
+      - name: Push code to test/CI environment
+        run: |
+          ggt push --app=store-locator-gbp --env=development --force --allow-unknown-directory
+        shell: bash
+        env:
+          GGT_TOKEN: ${{ secrets.GGT_TOKEN }}
+
+      - name: Deploy to production
+        run: |
+          ggt deploy --app=store-locator-gbp --env=development --force --allow-unknown-directory
+        shell: bash
+        env:
+          GGT_TOKEN: ${{ secrets.GGT_TOKEN }}
